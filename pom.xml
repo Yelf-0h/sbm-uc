@@ -59,6 +59,13 @@
             <version>${druid.version}</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.liuvei.common/liuvei-common -->
+        <dependency>
+            <groupId>com.liuvei.common</groupId>
+            <artifactId>liuvei-common</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>
