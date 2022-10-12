@@ -93,11 +93,12 @@ public class LoginController extends BaseController {
             mView.setViewName(getDispatcherPath("Login"));
             return mView;
         }
-        if (!bean.getUserPass().equals(userPass)) {
+        if (!bean.getUserPass().equals(SysFun.md5(userPass))) {
             request.setAttribute("msg", "密码错误");
             System.out.println(vMsg);
             mView.setViewName(getDispatcherPath("Login"));
             return mView;
+
         }
         System.out.println("登录成功");
         request.getSession().setAttribute(UIConst.BG_LOGINUSER_KEY, bean);
@@ -109,6 +110,23 @@ public class LoginController extends BaseController {
             return mView;
         }
         mView.setViewName(getDispatcherPath("Main"));
+        return mView;
+    }
+    /**
+     * 注销处理
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/Login_logoutDeal")
+    protected ModelAndView logoutDeal(HttpServletRequest
+                                              request,HttpServletResponse response){
+        handleBase(request,response);
+        ModelAndView mView = getMView("Login");
+//清空所有的会话数据
+        request.getSession().invalidate();
+//跳转到登录页面
+        mView.setViewName(getRedirectLogin());
         return mView;
     }
 
