@@ -12,6 +12,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -157,7 +158,7 @@ public class MemberController extends CrudController{
 
         Member bean = new Member();
         bean.setUserName(userName);
-        bean.setUserPass(userPass2);
+        bean.setUserPass(SysFun.md5(userPass2));
         bean.setNickName(nickName);
         bean.setEmail(email);
         Long result = 0L;
@@ -176,18 +177,127 @@ public class MemberController extends CrudController{
     }
 
     @Override
+    @RequestMapping(BEAN_PREFIX+"update")
     protected ModelAndView updateView(HttpServletRequest request, HttpServletResponse response) {
-        return null;
+        handleBase(request,response);
+        ModelAndView mView = getMView("Member","update");
+        HttpSession session = request.getSession();
+        ServletContext application = request.getServletContext();
+        String vId = request.getParameter("id");
+        if (!SysFun.isNullOrEmpty(vId)){
+            Long iId = SysFun.parseLong(vId);
+            Member bean = memberService.load(iId);
+            if (bean != null){
+                request.setAttribute("userId",bean.getUserId());
+                request.setAttribute("userName",bean.getUserName());
+                request.setAttribute("nickName",bean.getNickName());
+                request.setAttribute("email",bean.getEmail());
+                return mView;
+            }
+        }
+        mView.setViewName(getDispatcherPath("Go","preload"));
+        return mView;
     }
 
     @Override
+    @RequestMapping(BEAN_PREFIX+"updateDeal")
     protected ModelAndView updateDeal(HttpServletRequest request, HttpServletResponse response) {
-        return null;
+        handleBase(request,response);
+        ModelAndView mView = getMView("Member","update");
+        HttpSession session = request.getSession();
+        ServletContext application = request.getServletContext();
+        String userId = request.getParameter("userId");
+        String userName = request.getParameter("userName");
+        String userPass = request.getParameter("userPass");
+        String nickName = request.getParameter("nickName");
+        String email = request.getParameter("email");
+        request.setAttribute("userId",userId);
+        request.setAttribute("userName",userName);
+        request.setAttribute("nickName",nickName);
+        request.setAttribute("userPass",userPass);
+        request.setAttribute("email",email);
+
+        String vMsg = "";
+        if (SysFun.isNullOrEmpty(userId)){
+            vMsg += "主键不能为空。";
+        }
+        if (SysFun.isNullOrEmpty(userName)){
+            vMsg += "账号不能为空。";
+        }
+        if (SysFun.isNullOrEmpty(nickName)){
+            vMsg += "昵称不能为空。";
+        }
+        if (SysFun.isNullOrEmpty(email)){
+            vMsg += "邮箱不能为空。";
+        }
+        if (!SysFun.isNullOrEmpty(vMsg)){
+            request.setAttribute("msg",vMsg);
+            System.out.println(vMsg);
+            return mView;
+        }
+
+        /**
+         * 数据库验证
+         * */
+        Long iId = SysFun.parseLong(userId);
+        Member bean =memberService.load(iId);
+        if (bean == null){
+            vMsg += "记录不存在";
+        }
+        /**
+         * 如果验证失败则将失败内容放到作用域变量返回，并转发页面
+         */
+        if (!SysFun.isNullOrEmpty(vMsg)){
+            request.setAttribute("msg",vMsg);
+            System.out.println(vMsg);
+            return mView;
+        }
+        /**
+         * 真正处理
+         */
+        bean.setUserName(userName);
+        if (SysFun.isNullOrEmpty(userPass)){
+            /*密码为空，说明不需要更改密码*/
+        }else {
+            bean.setUserPass(SysFun.md5(userPass));
+        }
+        Date date = new Date();
+        bean.setNickName(nickName);
+        bean.setEmail(email);
+        bean.setUpdateOn(date);
+        Long result = 0L;
+        try {
+            result = memberService.update(bean);
+        } catch (Exception e) {
+            vMsg += "修改失败，原因："+e.getMessage();
+        }
+        if (result>0){
+            mView.setViewName(getDispatcherPath("Go","preload"));
+            return mView;
+        }else {
+            request.setAttribute("msg",vMsg);
+            return mView;
+        }
     }
 
     @Override
+    @RequestMapping(BEAN_PREFIX+"detail")
     protected ModelAndView detailView(HttpServletRequest request, HttpServletResponse response) {
-        return null;
+        handleBase(request,response);
+        ModelAndView mView = getMView("Member","detail");
+        HttpSession session = request.getSession();
+        ServletContext application = request.getServletContext();
+        String vId = request.getParameter("id");
+        if (!SysFun.isNullOrEmpty(vId)){
+            Long iId = SysFun.parseLong(vId);
+            Member bean = memberService.load(iId);
+            if (bean != null){
+                request.setAttribute("bean",bean);
+                return mView;
+            }
+        }
+        mView.setViewName(getDispatcherPath("Go","preload"));
+        return mView;
     }
 
     @Override
@@ -201,7 +311,24 @@ public class MemberController extends CrudController{
     }
 
     @Override
+    @RequestMapping(BEAN_PREFIX+"deleteDeal")
     protected ModelAndView deleteDeal(HttpServletRequest request, HttpServletResponse response) {
-        return null;
+        handleBase(request,response);
+        ModelAndView mView = getMView("Member","delete");
+        /**
+         * 获取主键，再根据主键获取记录
+         */
+        String vId = request.getParameter("id");
+
+        if (!SysFun.isNullOrEmpty(vId)){
+            Long iId = SysFun.parseLong(vId);
+            Long result = memberService.delete(iId);
+            if (result > 0){
+                mView.setViewName(getDispatcherPath("Go","ok"));
+                return mView;
+            }
+        }
+        mView.setViewName(getDispatcherPath("Go","no"));
+        return mView;
     }
 }

@@ -129,6 +129,10 @@
     function member_show(title,url,id,w,h){
         layer_show(title,url,w,h);
     }
+    /*项目-查看*/
+    function item_detail(title,url,id,w,h){
+        layer_show(title,url,w,h);
+    }
     /*用户-停用*/
     function member_stop(obj,id){
         layer.confirm('确认要停用吗？',function(index){
@@ -193,6 +197,68 @@
             });
         });
     }
+    /*项目-删除*/
+    function item_del(obj,id){
+        layer.confirm('确认要删除吗？',function(index){
+            $.ajax({
+                type: 'POST',
+                url: 'Member_deleteDeal?id='+id,
+                // dataType: 'json',
+                success: function(data){
+                    if (data == "ok") {
+                        $(obj).parents("tr").remove();
+                        layer.msg('已删除!', {icon: 1, time: 1000});
+                    }else {
+                        layer.msg('删除失败!', {icon: 1, time: 1000});
+                    }
+                },
+                error:function(data) {
+                    console.log(data.msg);
+                },
+            });
+        });
+    }
+    /*项目-编辑*/
+    function item_edit(title,url,id,w,h){
+        layer_show(title,url,w,h);
+    }
+
+    function datadel() {
+        layer.confirm('确认要删除选择中的数据吗？',function (index) {
+            var  num=0;
+            var  total=0;
+            var  obj = null;
+            $("#datalist input[type=checkbox]:checked ").each(function () {
+                obj=this;
+                id=$(this).val();
+                if(id!=null && id != "0"){
+                    total++;
+                    $.ajax({
+                        type: 'POST',
+                        url: 'Member_deleteDeal',
+                        async:false,
+                        data:{"id":id},
+                        success: function(data){
+                            if(data=="ok"){
+                                $(obj).parents("tr").remove();
+                                num++;
+                            }else {
+                                /*layer.msg('删除失败！',{
+                                    icon:1,time:1000
+                                })*/
+                            }
+                        },
+                        error:function(data) {
+                            // console.log(data.msg);
+                        },
+                    });
+                    layer.msg('要删除'+total+'行记录,成功删除'+num+'行记录。',{icon:1,time:3000});
+                }
+
+            })
+        })
+    }
+
 </script>
 </body>
 </html>
