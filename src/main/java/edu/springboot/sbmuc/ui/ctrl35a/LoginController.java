@@ -106,7 +106,7 @@ public class LoginController extends BaseController {
             request.getSession().setAttribute(UIConst.BG_ISADMIN_KEY, true);
         }
         if (!SysFun.isNullOrEmpty(redirectUrl)) {
-            mView.setViewName("redirect"+ redirectUrl);
+            mView.setViewName("redirect:"+ redirectUrl);
             return mView;
         }
         mView.setViewName(getDispatcherPath("Main"));
