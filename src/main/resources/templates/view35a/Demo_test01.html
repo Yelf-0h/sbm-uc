@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Demo_test01【json】</title>
+</head>
+<body>
+<script type="text/javascript" th:src="@{/static/H-ui.admin/lib/jquery/1.9.1/jquery.min.js}"></script>
+[[${Pub_RealPath}]]
+<hr/>
+
+<button id="btn">点击我--查看json</button>
+<div id="msg"></div>
+<script type="text/javascript">
+    $(function () {
+        $("#btn").click(function () {
+            $.getJSON("Demo_json02",function (jsonobj) {
+                if (jsonobj.code > 0) {
+                    var str = "";
+                    $.each(jsonobj.data, function (i, item) {
+                        str += "<br/>" + item.userName;
+                    });
+                    $("#msg").html(str);
+                } else {
+                    $("#msg").html(jsonobj.desc)
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
+

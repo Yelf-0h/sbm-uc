@@ -1,5 +1,6 @@
 package edu.springboot.sbmuc.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -39,5 +40,6 @@ public class Member implements java.io.Serializable {
     private Long createBy;
     private Long updateBy;
     private java.util.Date createOn;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private java.util.Date updateOn;
 }

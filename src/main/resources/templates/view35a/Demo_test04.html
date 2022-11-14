@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Demo_test04【down】</title>
+</head>
+<body>
+
+<div>第一种下载方式：</div>
+<div th:each="item : ${listFile}">
+    <a th:href="@{'Res_down?fileName=' + ${item}}">[[${item}]]</a>
+</div>
+
+<hr/>
+<div>第二种下载方式：</div>
+<div th:each="item : ${listFile}">
+    <a th:href="@{'Res_down2?fileName=' + ${item}}">[[${item}]]</a>
+</div>
+
+</body>
+</html>
