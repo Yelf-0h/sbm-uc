@@ -6,6 +6,7 @@ import edu.springboot.sbmuc.ui.ctrl35a.UIConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -38,5 +39,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns(UIConst.AREAPATH+"/Api*")
                 .excludePathPatterns(UIConst.AREAPATH+"/Api_err");
     }
+
 
 }
