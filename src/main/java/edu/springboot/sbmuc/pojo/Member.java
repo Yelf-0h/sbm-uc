@@ -1,24 +1,26 @@
 package edu.springboot.sbmuc.pojo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * 成员
  * 用户
  *
+ * @author Yefl
  * @TableName member
+ * @date 2022/11/21
  */
 @EqualsAndHashCode
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class Member implements java.io.Serializable {
+    public static final Long serialVersionUID = 1L;
     private Long userId;
     private String userName;
     private String userPass;

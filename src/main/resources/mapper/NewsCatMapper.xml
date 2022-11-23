@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- ***** 每个dao接口对应一个映射文件 -->
+<!-- (1) mapper根标签中的namespace是dao接口的全名； -->
+<!-- (2) mapper根标签对应的CRUD操作的四个标签 为：select/insert/delelte/update； -->
+<!-- (3) CRUD标签是可以对dao接口中的每个方法配置对应的sql； -->
+<!-- (4) CRUD标签中的id属性表示接口的方法名称； -->
+<!-- (5) CRUD标签中的resultType属性表示接口方法的返回类型全名； -->
+<!-- (6) CRUD标签中的parameterType属性表示接口方法的参数类型全名； -->
+<!-- (7) CRUD标签中的内容存放接口方法对应的sql； -->
+<!-- (8) sql中引用参数时，以#号打头，大括号引住； -->
+<mapper namespace="edu.springboot.sbmuc.mapper.NewsCatMapper">
+
+
+
+	<!-- list -->
+	<select id="list" resultType="edu.springboot.sbmuc.pojo.NewsCat">
+	<![CDATA[ 
+		select * from NewsCat 
+		order by catId desc
+	]]>
+	</select>
+	<select id="load" parameterType="java.lang.Long" resultType="edu.springboot.sbmuc.pojo.NewsCat">
+	<![CDATA[
+		select * from NewsCat
+		where catId=#{id}
+		]]>
+	</select>
+
+	<update id="update" parameterType="edu.springboot.sbmuc.pojo.NewsCat">
+	<![CDATA[
+		update NewsCat
+		set
+			catName=#{catName},catDesc=#{catDesc},parentId=#{parentId},
+		    status=#{status},remark=#{remark},sortNum=#{sortNum},
+		    isDeleted=#{isDeleted},createBy=#{createBy},
+		    updateBy=#{updateBy},createOn=#{createOn},updateOn=#{updateOn}
+		where catId=#{catId}
+		]]>
+
+
+
+</update>
+	<insert id="insert" parameterType="edu.springboot.sbmuc.pojo.NewsCat">
+		<![CDATA[
+		insert into NewsCat(
+			catName,catDesc,status,remark,sortNum,isDeleted,createBy,updateBy,createOn,updateOn
+		)values(
+			#{catName},#{catDesc},#{status},#{remark},#{sortNum},#{isDeleted},#{createBy},#{updateBy},#{createOn},#{updateOn}
+
+			   )
+
+		]]>
+	</insert>
+	<select id="selectId" resultType="java.lang.Long">
+		<![CDATA[
+		select @@IDENTITY
+		]]>
+	</select>
+
+	<select id="count" resultType="java.lang.Long">
+	<![CDATA[
+		select count(1) from NewsCat
+		]]>
+	</select>
+
+	<delete id="delete" parameterType="java.lang.Long">
+		<![CDATA[
+		delete from NewsCat where catId=#{id}
+		]]>
+	</delete>
+
+	<select id="countByName" resultType="java.lang.Long">
+	<![CDATA[
+		select count(1) from NewsCat
+		where catName like #{catname}
+		]]>
+	</select>
+	<select id="loadByName" parameterType="java.lang.String" resultType="edu.springboot.sbmuc.pojo.NewsCat">
+	<![CDATA[
+		select * from NewsCat
+		where catName = #{catname}
+		order by catId asc
+		]]>
+	</select>
+<select id="pager" resultType="edu.springboot.sbmuc.pojo.NewsCat">
+	<![CDATA[
+	select * from NewsCat
+	order by catId asc
+	limit #{pageNum}, #{pageSize}
+	]]>
+</select>
+	<!-- pagerByName -->
+	<select id="pagerByName" resultType="edu.springboot.sbmuc.pojo.NewsCat">
+            <![CDATA[
+		select *
+		from NewsCat
+		where catName like CONCAT(CONCAT('%', #{name}), '%')
+		order by catId desc
+			limit #{pageNum}, #{pageSize}
+		]]>
+</select>
+
+</mapper>

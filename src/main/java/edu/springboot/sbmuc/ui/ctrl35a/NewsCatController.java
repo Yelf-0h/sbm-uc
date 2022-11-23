@@ -2,16 +2,18 @@ package edu.springboot.sbmuc.ui.ctrl35a;
 
 import com.liuvei.common.PagerItem;
 import com.liuvei.common.SysFun;
-import edu.springboot.sbmuc.pojo.Member;
-import edu.springboot.sbmuc.service.MemberService;
+import edu.springboot.sbmuc.pojo.NewsCat;
+import edu.springboot.sbmuc.service.NewsCatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -21,19 +23,19 @@ import java.util.List;
  */
 @Controller
 @RequestMapping(UIConst.AREAPATH)
-public class MemberController extends CrudController{
+public class NewsCatController extends CrudController{
 
     @Autowired
-    private MemberService memberService;
+    private NewsCatService newsCatService;
 
-    public MemberController() {
+    public NewsCatController() {
         super();
     }
 
     /**
      * 各方法的路径的Bean的前缀
      */
-    public final static String BEAN_PREFIX = "/Member_";
+    public final static String BEAN_PREFIX = "/NewsCat_";
 
 
     @Override
@@ -41,8 +43,8 @@ public class MemberController extends CrudController{
     protected ModelAndView listView(HttpServletRequest request,
                                     HttpServletResponse response) {
         handleBase(request,response);
-        ModelAndView mView = getMView("Member", "list");
-        List<Member> vDataList = null;
+        ModelAndView mView = getMView("NewsCat", "list");
+        List<NewsCat> vDataList = null;
         // ---------------------------------------------------------------------
         // 分页步骤1. 创建PagerIter对象, 处理url传过来的pagesize和pageindex
         PagerItem pagerItem = new PagerItem();
@@ -51,11 +53,11 @@ public class MemberController extends CrudController{
         // 分页步骤2.1. 定义记录数变量
         Long rowCount = 0L;
         // 分页步骤2.2. 根据条件，查找符合条件的所有记录数 ***** count()要根据实际换成其它方法
-        rowCount = memberService.count();
+        rowCount = newsCatService.count();
         // 分页步骤2.3. 将记录数赋给pagerItem，以便进行分页的各类计算
         pagerItem.changeRowCount(rowCount);
         // 分页步骤2.4. 从数据库取指定分页的数据 ***** pager()要根据实际换成其它方法
-        vDataList = memberService.pager(pagerItem.getPageNum(),pagerItem.getPageSize());
+        vDataList = newsCatService.pager(pagerItem.getPageNum(),pagerItem.getPageSize());
         // 分页步骤2.5. 设置页面的跳转url
         pagerItem.changeUrl(SysFun.generalUrl(request.getRequestURI(),request.getQueryString()));
         // 分页步骤3. 将分页对象和数据列表,放到作用域,以便页面可以访问
@@ -63,7 +65,7 @@ public class MemberController extends CrudController{
         request.setAttribute("DataList", vDataList);
         // ---------------------------------------------------------------------
         // 转发到列表页面
-        mView.setViewName(getDispatcherPath("Member", "list"));
+        mView.setViewName(getDispatcherPath("NewsCat", "list"));
         return mView;
     }
 
@@ -71,34 +73,34 @@ public class MemberController extends CrudController{
     @RequestMapping(BEAN_PREFIX+"listDeal")
     protected ModelAndView listDeal(HttpServletRequest request, HttpServletResponse response) {
         handleBase(request,response);
-        ModelAndView mView = getMView("Member","list");
-        String name = request.getParameter("userName");
-        request.setAttribute("userName",name);
+        ModelAndView mView = getMView("NewsCat","list");
+        String name = request.getParameter("catName");
+        request.setAttribute("catName",name);
         if (!SysFun.isNullOrEmpty(name)){
             name = name.trim();
         }else {
             name = "";
         }
-        List<Member> vDataList = null;
+        List<NewsCat> vDataList = null;
 
         PagerItem pagerItem = new PagerItem();
         pagerItem.parsePageSize(request.getParameter(pagerItem.getParamPageSize()));
         pagerItem.parsePageNum(request.getParameter(pagerItem.getParamPageNum()));
         Long rowCount = 0L;
         if (!SysFun.isNullOrEmpty(name)){
-            rowCount = memberService.countByName(name);
+            rowCount = newsCatService.countByName(name);
             pagerItem.changeRowCount(rowCount);
-            vDataList = memberService.pagerByName(name, pagerItem.getPageNum(), pagerItem.getPageSize());
+            vDataList = newsCatService.pagerByName(name, pagerItem.getPageNum(), pagerItem.getPageSize());
         }else {
-            rowCount = memberService.count();
+            rowCount = newsCatService.count();
             pagerItem.changeRowCount(rowCount);
-            vDataList = memberService.pager(pagerItem.getPageNum(), pagerItem.getPageSize());
+            vDataList = newsCatService.pager(pagerItem.getPageNum(), pagerItem.getPageSize());
         }
         pagerItem.changeUrl(SysFun.generalUrl(request.getRequestURI(),request.getQueryString()));
         request.setAttribute("pagerItem",pagerItem);
         request.setAttribute("DataList",vDataList);
 
-        mView.setViewName(getDispatcherPath("Member","list"));
+        mView.setViewName(getDispatcherPath("NewsCat","list"));
         return mView;
     }
 
@@ -106,7 +108,7 @@ public class MemberController extends CrudController{
     @RequestMapping(BEAN_PREFIX+"insert")
     protected ModelAndView insertView(HttpServletRequest request, HttpServletResponse response) {
         handleBase(request,response);
-        ModelAndView mView = getMView("Member","insert");
+        ModelAndView mView = getMView("NewsCat","insert");
         return mView;
     }
 
@@ -114,41 +116,26 @@ public class MemberController extends CrudController{
     @RequestMapping(BEAN_PREFIX+"insertDeal")
     protected ModelAndView insertDeal(HttpServletRequest request, HttpServletResponse response) {
         handleBase(request,response);
-        ModelAndView mView = getMView("Member","insert");
+        ModelAndView mView = getMView("NewsCat","insert");
         HttpSession session = request.getSession();
         ServletContext application = request.getServletContext();
 
-        String userName = request.getParameter("userName");
-        String userPass = request.getParameter("userPass");
-        String userPass2 = request.getParameter("userPass2");
-        String nickName = request.getParameter("nickName");
-        String email = request.getParameter("email");
+        String catName = request.getParameter("catName");
+        String catDesc = request.getParameter("catDesc");
 
-        request.setAttribute("userName",userName);
-        request.setAttribute("userPass",userPass);
-        request.setAttribute("userPass2",userPass2);
-        request.setAttribute("nickName",nickName);
-        request.setAttribute("email",email);
+        request.setAttribute("catName",catName);
+        request.setAttribute("catDesc",catDesc);
 
         String vMsg = "";
-        if (SysFun.isNullOrEmpty(userName)){
-            vMsg += "账号不能为空。";
+        if (SysFun.isNullOrEmpty(catName)){
+            vMsg += "类目名不能为空。";
         }
-        if (SysFun.isNullOrEmpty(userPass)){
-            vMsg += "密码不能为空。";
+        if (SysFun.isNullOrEmpty(catDesc)){
+            vMsg += "说明不能为空。";
         }
-        if (SysFun.isNullOrEmpty(userPass2)){
-            vMsg += "密码不能为空。";
-        }
-        if (SysFun.isNullOrEmpty(nickName)){
-            vMsg += "昵称不能为空。";
-        }
-        if (SysFun.isNullOrEmpty(email)){
-            vMsg += "邮箱不能为空。";
-        }
-        Member member = memberService.loadByName(userName);
-        if (member != null){
-            vMsg += "该用户存在。";
+        NewsCat newsCat = newsCatService.loadByName(catName);
+        if (newsCat != null){
+            vMsg += "该类目已存在。";
         }
         if (!SysFun.isNullOrEmpty(vMsg)){
             request.setAttribute("msg",vMsg);
@@ -156,14 +143,17 @@ public class MemberController extends CrudController{
             return mView;
         }
 
-        Member bean = new Member();
-        bean.setUserName(userName);
-        bean.setUserPass(SysFun.md5(userPass2));
-        bean.setNickName(nickName);
-        bean.setEmail(email);
+        NewsCat bean = new NewsCat();
+        bean.setCatName(catName);
+        bean.setCatDesc(catDesc);
+        bean.setParentId(0L);
+        bean.setSortNum(0L);
+        Date date = new Date();
+        bean.setCreateOn(date);
+        bean.setUpdateOn(date);
         Long result = 0L;
         try {
-            result = memberService.insert(bean);
+            result = newsCatService.insert(bean);
         }catch (Exception e){
             vMsg += "添加失败，原因："+e.getMessage();
         }
@@ -180,18 +170,18 @@ public class MemberController extends CrudController{
     @RequestMapping(BEAN_PREFIX+"update")
     protected ModelAndView updateView(HttpServletRequest request, HttpServletResponse response) {
         handleBase(request,response);
-        ModelAndView mView = getMView("Member","update");
+        ModelAndView mView = getMView("NewsCat","update");
         HttpSession session = request.getSession();
         ServletContext application = request.getServletContext();
         String vId = request.getParameter("id");
         if (!SysFun.isNullOrEmpty(vId)){
             Long iId = SysFun.parseLong(vId);
-            Member bean = memberService.load(iId);
+            NewsCat bean = newsCatService.load(iId);
             if (bean != null){
-                request.setAttribute("userId",bean.getUserId());
-                request.setAttribute("userName",bean.getUserName());
-                request.setAttribute("nickName",bean.getNickName());
-                request.setAttribute("email",bean.getEmail());
+                request.setAttribute("catId",bean.getCatId());
+                request.setAttribute("catName",bean.getCatName());
+                request.setAttribute("catDesc",bean.getCatDesc());
+
                 return mView;
             }
         }
@@ -203,32 +193,25 @@ public class MemberController extends CrudController{
     @RequestMapping(BEAN_PREFIX+"updateDeal")
     protected ModelAndView updateDeal(HttpServletRequest request, HttpServletResponse response) {
         handleBase(request,response);
-        ModelAndView mView = getMView("Member","update");
+        ModelAndView mView = getMView("NewsCat","update");
         HttpSession session = request.getSession();
         ServletContext application = request.getServletContext();
-        String userId = request.getParameter("userId");
-        String userName = request.getParameter("userName");
-        String userPass = request.getParameter("userPass");
-        String nickName = request.getParameter("nickName");
-        String email = request.getParameter("email");
-        request.setAttribute("userId",userId);
-        request.setAttribute("userName",userName);
-        request.setAttribute("nickName",nickName);
-        request.setAttribute("userPass",userPass);
-        request.setAttribute("email",email);
+        String catId = request.getParameter("catId");
+        String catName = request.getParameter("catName");
+        String catDesc = request.getParameter("catDesc");
+        request.setAttribute("catId",catId);
+        request.setAttribute("catName",catName);
+        request.setAttribute("catDesc",catDesc);
 
         String vMsg = "";
-        if (SysFun.isNullOrEmpty(userId)){
+        if (SysFun.isNullOrEmpty(catId)){
             vMsg += "主键不能为空。";
         }
-        if (SysFun.isNullOrEmpty(userName)){
-            vMsg += "账号不能为空。";
+        if (SysFun.isNullOrEmpty(catName)){
+            vMsg += "类目名称不能为空。";
         }
-        if (SysFun.isNullOrEmpty(nickName)){
-            vMsg += "昵称不能为空。";
-        }
-        if (SysFun.isNullOrEmpty(email)){
-            vMsg += "邮箱不能为空。";
+        if (SysFun.isNullOrEmpty(catDesc)){
+            vMsg += "类目说明不能为空。";
         }
         if (!SysFun.isNullOrEmpty(vMsg)){
             request.setAttribute("msg",vMsg);
@@ -239,8 +222,8 @@ public class MemberController extends CrudController{
         /**
          * 数据库验证
          * */
-        Long iId = SysFun.parseLong(userId);
-        Member bean =memberService.load(iId);
+        Long iId = SysFun.parseLong(catId);
+        NewsCat bean = newsCatService.load(iId);
         if (bean == null){
             vMsg += "记录不存在";
         }
@@ -255,19 +238,17 @@ public class MemberController extends CrudController{
         /**
          * 真正处理
          */
-        bean.setUserName(userName);
-        if (SysFun.isNullOrEmpty(userPass)){
+        bean.setCatName(catName);
+        if (SysFun.isNullOrEmpty(catDesc)){
             /*密码为空，说明不需要更改密码*/
         }else {
-            bean.setUserPass(SysFun.md5(userPass));
+            bean.setCatDesc(catDesc);
         }
         Date date = new Date();
-        bean.setNickName(nickName);
-        bean.setEmail(email);
         bean.setUpdateOn(date);
         Long result = 0L;
         try {
-            result = memberService.update(bean);
+            result = newsCatService.update(bean);
         } catch (Exception e) {
             vMsg += "修改失败，原因："+e.getMessage();
         }
@@ -284,13 +265,13 @@ public class MemberController extends CrudController{
     @RequestMapping(BEAN_PREFIX+"detail")
     protected ModelAndView detailView(HttpServletRequest request, HttpServletResponse response) {
         handleBase(request,response);
-        ModelAndView mView = getMView("Member","detail");
+        ModelAndView mView = getMView("NewsCat","detail");
         HttpSession session = request.getSession();
         ServletContext application = request.getServletContext();
         String vId = request.getParameter("id");
         if (!SysFun.isNullOrEmpty(vId)){
             Long iId = SysFun.parseLong(vId);
-            Member bean = memberService.load(iId);
+            NewsCat bean = newsCatService.load(iId);
             if (bean != null){
                 request.setAttribute("bean",bean);
                 return mView;
@@ -314,7 +295,7 @@ public class MemberController extends CrudController{
     @RequestMapping(BEAN_PREFIX+"deleteDeal")
     protected ModelAndView deleteDeal(HttpServletRequest request, HttpServletResponse response) {
         handleBase(request,response);
-        ModelAndView mView = getMView("Member","delete");
+        ModelAndView mView = getMView("NewsCat","delete");
         /**
          * 获取主键，再根据主键获取记录
          */
@@ -322,7 +303,7 @@ public class MemberController extends CrudController{
 
         if (!SysFun.isNullOrEmpty(vId)){
             Long iId = SysFun.parseLong(vId);
-            Long result = memberService.delete(iId);
+            Long result = newsCatService.delete(iId);
             if (result > 0){
                 mView.setViewName(getDispatcherPath("Go","ok"));
                 return mView;

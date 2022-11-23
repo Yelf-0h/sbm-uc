@@ -12,6 +12,7 @@ import java.util.List;
  * @createDate 2022-09-07 08:49:57
  * @Entity edu.springboot.sbmuc.pojo.Member
  */
+
 public interface MemberMapper extends BaseDao<Member>{
 
 }

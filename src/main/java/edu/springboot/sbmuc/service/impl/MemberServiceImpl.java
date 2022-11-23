@@ -41,6 +41,7 @@ public class MemberServiceImpl extends BaseServiceImpl<Member> implements Member
 
     @Override
     public Member load(Long id) {
+
         return memberMapper.load(id);
     }
 
